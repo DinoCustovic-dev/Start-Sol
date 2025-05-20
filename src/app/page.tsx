@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div className='p-4'>Hello</div>;
+import { Hero } from '@/app/components/Hero';
+
+export default function HomePage() {
+  return <Hero />;
 }
