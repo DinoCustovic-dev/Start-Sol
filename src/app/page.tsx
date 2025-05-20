@@ -1,7 +1,3 @@
-export default function HomePage() {
-  return (
-    <div className='flex min-h-screen items-center justify-center bg-white'>
-      hello
-    </div>
-  );
+export default function Page() {
+  return <div className='p-4'>Hello</div>;
 }
