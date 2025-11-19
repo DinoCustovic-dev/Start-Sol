@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Coins, Loader } from 'lucide-react';
 import { useState } from 'react';
 
-import { type TokenInfo, solanaService } from '@/lib/solana/solanaService';
+import { type TokenInfo } from '@/lib/solana/mockSolana';
+import { solanaService } from '@/lib/solana/solanaService';
 
 import Button from '@/components/buttons/Button';
 

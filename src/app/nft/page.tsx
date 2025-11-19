@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Image as ImageIcon, Loader, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { type NFTInfo, solanaService } from '@/lib/solana/solanaService';
+import { type NFTInfo } from '@/lib/solana/mockSolana';
+import { solanaService } from '@/lib/solana/solanaService';
 
 import Button from '@/components/buttons/Button';
 

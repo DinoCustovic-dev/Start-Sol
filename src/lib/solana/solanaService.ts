@@ -6,8 +6,10 @@
  */
 
 import {
-  createMint,
+  createInitializeMintInstruction,
+  getMinimumBalanceForRentExemptMint,
   getOrCreateAssociatedTokenAccount,
+  MINT_SIZE,
   mintTo,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
@@ -122,19 +124,42 @@ class SolanaService {
     signTransaction: (tx: Transaction) => Promise<Transaction>,
   ): Promise<TokenInfo> {
     try {
-      // Create mint
-      const mint = await createMint(
-        connection,
-        { publicKey: payer, signTransaction },
-        payer,
-        null,
-        decimals,
+      // Generate new mint keypair
+      const mintKeypair = Keypair.generate();
+      const mint = mintKeypair.publicKey;
+
+      // Get minimum balance for rent exemption
+      const lamports = await getMinimumBalanceForRentExemptMint(connection);
+
+      // Build transaction to create mint
+      const transaction = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: payer,
+          newAccountPubkey: mint,
+          space: MINT_SIZE,
+          lamports,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeMintInstruction(
+          mint,
+          decimals,
+          payer,
+          payer, // freezeAuthority (can be null, but using payer for simplicity)
+        ),
       );
+
+      // Sign and send transaction
+      const signed = await signTransaction(transaction);
+      // Add mint keypair signature
+      signed.partialSign(mintKeypair);
+      const signature = await connection.sendRawTransaction(signed.serialize());
+      await connection.confirmTransaction(signature);
 
       // Create associated token account
       const tokenAccount = await getOrCreateAssociatedTokenAccount(
         connection,
-        { publicKey: payer, signTransaction },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { publicKey: payer, signTransaction } as any,
         mint,
         payer,
       );
@@ -142,7 +167,8 @@ class SolanaService {
       // Mint initial supply
       await mintTo(
         connection,
-        { publicKey: payer, signTransaction },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { publicKey: payer, signTransaction } as any,
         mint,
         tokenAccount.address,
         payer,
@@ -202,19 +228,41 @@ class SolanaService {
     signTransaction: (tx: Transaction) => Promise<Transaction>,
   ): Promise<NFTInfo> {
     try {
-      // For now, create a token with supply of 1 (NFT-like)
-      // In production, use Metaplex Token Metadata Program for proper NFTs
-      const mint = await createMint(
-        connection,
-        { publicKey: payer, signTransaction },
-        payer,
-        null,
-        0, // 0 decimals = NFT
+      // Generate new mint keypair for NFT
+      const mintKeypair = Keypair.generate();
+      const mint = mintKeypair.publicKey;
+
+      // Get minimum balance for rent exemption
+      const lamports = await getMinimumBalanceForRentExemptMint(connection);
+
+      // Build transaction to create mint (0 decimals = NFT)
+      const transaction = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: payer,
+          newAccountPubkey: mint,
+          space: MINT_SIZE,
+          lamports,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeMintInstruction(
+          mint,
+          0, // 0 decimals = NFT
+          payer,
+          payer,
+        ),
       );
+
+      // Sign and send transaction
+      const signed = await signTransaction(transaction);
+      // Add mint keypair signature
+      signed.partialSign(mintKeypair);
+      const signature = await connection.sendRawTransaction(signed.serialize());
+      await connection.confirmTransaction(signature);
 
       const tokenAccount = await getOrCreateAssociatedTokenAccount(
         connection,
-        { publicKey: payer, signTransaction },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { publicKey: payer, signTransaction } as any,
         mint,
         payer,
       );
@@ -222,7 +270,8 @@ class SolanaService {
       // Mint exactly 1 token (NFT)
       await mintTo(
         connection,
-        { publicKey: payer, signTransaction },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        { publicKey: payer, signTransaction } as any,
         mint,
         tokenAccount.address,
         payer,
