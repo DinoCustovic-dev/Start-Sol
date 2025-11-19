@@ -1,45 +1,33 @@
 'use client';
 
+import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  Check,
-  Copy,
-  Download,
-  Eye,
-  EyeOff,
-  Plus,
-  RefreshCw,
-  Wallet,
-} from 'lucide-react';
+import { ArrowRight, Check, Copy, RefreshCw, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { type WalletInfo, mockSolana } from '@/lib/solana/mockSolana';
+import { solanaService } from '@/lib/solana/solanaService';
 
 import Button from '@/components/buttons/Button';
 
 export default function WalletPage() {
-  const [wallet, setWallet] = useState<WalletInfo | null>(null);
+  const { publicKey, connected } = useWallet();
   const [balance, setBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showPrivateKey, setShowPrivateKey] = useState(false);
-  const [privateKey, setPrivateKey] = useState<string>('');
 
-  // Load wallet from localStorage on mount
+  // Load balance when wallet connects or address changes
   useEffect(() => {
-    const savedWallet = localStorage.getItem('demo_wallet');
-    if (savedWallet) {
-      const parsed = JSON.parse(savedWallet);
-      setWallet(parsed);
-      loadBalance(parsed.address);
+    if (connected && publicKey) {
+      loadBalance(publicKey.toString());
+    } else {
+      setBalance(0);
     }
-  }, []);
+  }, [connected, publicKey]);
 
   const loadBalance = async (address: string) => {
     setIsLoading(true);
     try {
-      const bal = await mockSolana.getBalance(address);
+      const bal = await solanaService.getBalance(address);
       setBalance(bal);
     } catch (error) {
       // Error loading balance
@@ -48,53 +36,28 @@ export default function WalletPage() {
     }
   };
 
-  const createWallet = async () => {
-    setIsLoading(true);
-    try {
-      const newWallet = await mockSolana.createWallet();
-      // Generate a mock private key for demo (in real app, this would be from Keypair)
-      const mockPrivateKey = Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16),
-      ).join('');
-
-      setWallet(newWallet);
-      setPrivateKey(mockPrivateKey);
-      setBalance(0);
-
-      // Save to localStorage
-      localStorage.setItem('demo_wallet', JSON.stringify(newWallet));
-      localStorage.setItem('demo_private_key', mockPrivateKey);
-    } catch (error) {
-      // Error creating wallet
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const importWallet = () => {
-    // For demo, we'll just create a new wallet
-    // In real implementation, this would import from private key or seed phrase
-    createWallet();
-  };
-
   const requestAirdrop = async () => {
-    if (!wallet) return;
+    if (!publicKey) return;
 
     setIsLoading(true);
     try {
-      await mockSolana.requestAirdrop(wallet.address, 1);
-      await loadBalance(wallet.address);
+      await solanaService.requestAirdrop(publicKey.toString(), 1);
+      // Wait a bit for transaction to confirm
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await loadBalance(publicKey.toString());
     } catch (error) {
-      // Error requesting airdrop
+      alert(
+        'Airdrop failed. Make sure you are on devnet and not rate limited.',
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const copyAddress = async () => {
-    if (!wallet) return;
+    if (!publicKey) return;
 
-    await navigator.clipboard.writeText(wallet.address);
+    await navigator.clipboard.writeText(publicKey.toString());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -114,25 +77,12 @@ export default function WalletPage() {
             Moj Wallet
           </h1>
           <p className='text-xl text-gray-300'>
-            Kreirajte ili upravljajte svojim Solana walletom
+            Povežite svoj wallet i upravljajte svojim Solana sredstvima
           </p>
         </motion.div>
 
-        {/* Demo Mode Banner */}
-        <motion.div
-          className='mb-8 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <p className='text-yellow-200 text-sm text-center'>
-            🧪 Demo Mode: Ovo je simulacija. Stvarni wallet će biti povezan s
-            Solana blockchainom kada implementiramo pravu integraciju.
-          </p>
-        </motion.div>
-
-        {!wallet ? (
-          /* Create/Import Wallet */
+        {!connected ? (
+          /* Connect Wallet Prompt */
           <motion.div
             className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-8 md:p-12'
             initial={{ opacity: 0, scale: 0.95 }}
@@ -143,33 +93,12 @@ export default function WalletPage() {
               <div>
                 <Wallet className='w-20 h-20 mx-auto text-purple-300 mb-4' />
                 <h2 className='text-3xl font-bold text-white mb-4'>
-                  Kreirajte svoj Wallet
+                  Povežite svoj Wallet
                 </h2>
                 <p className='text-gray-300 text-lg max-w-2xl mx-auto'>
-                  Wallet je vaš pristup Solana ekosistemu. Kreirajte novi ili
-                  importajte postojeći.
+                  Koristite gumb u navigaciji gore desno da biste se povezali sa
+                  svojim Solana walletom (Phantom, Solflare, itd.)
                 </p>
-              </div>
-
-              <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-                <Button
-                  variant='primary'
-                  onClick={createWallet}
-                  isLoading={isLoading}
-                  className='bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-lg px-8 py-4 rounded-xl min-w-[200px]'
-                >
-                  <Plus className='w-5 h-5 mr-2' />
-                  Kreiraj Novi Wallet
-                </Button>
-                <Button
-                  variant='outline'
-                  onClick={importWallet}
-                  isLoading={isLoading}
-                  className='border-2 border-purple-300 text-purple-300 hover:bg-purple-700/50 font-bold text-lg px-8 py-4 rounded-xl min-w-[200px]'
-                >
-                  <Download className='w-5 h-5 mr-2' />
-                  Import Wallet
-                </Button>
               </div>
 
               <div className='bg-purple-500/10 border border-purple-500/30 rounded-xl p-6 text-left max-w-2xl mx-auto'>
@@ -196,6 +125,14 @@ export default function WalletPage() {
                   </li>
                 </ul>
               </div>
+
+              <div className='bg-blue-500/10 border border-blue-500/30 rounded-xl p-4'>
+                <p className='text-blue-200 text-sm'>
+                  💡 <strong>Savjet:</strong> Instalirajte Phantom wallet
+                  extension ako ga još nemate. Nakon instalacije, osvježite
+                  stranicu i kliknite gumb "Select Wallet" u navigaciji.
+                </p>
+              </div>
             </div>
           </motion.div>
         ) : (
@@ -211,7 +148,7 @@ export default function WalletPage() {
                 <h2 className='text-2xl font-bold text-white'>Balance</h2>
                 <Button
                   variant='ghost'
-                  onClick={() => loadBalance(wallet.address)}
+                  onClick={() => publicKey && loadBalance(publicKey.toString())}
                   isLoading={isLoading}
                   className='text-purple-300 hover:text-purple-200'
                 >
@@ -238,7 +175,7 @@ export default function WalletPage() {
               </h3>
               <div className='flex items-center gap-3 bg-gray-900/50 rounded-lg p-4'>
                 <code className='flex-1 text-purple-300 font-mono text-sm break-all'>
-                  {wallet.address}
+                  {publicKey?.toString()}
                 </code>
                 <Button
                   variant='ghost'
@@ -254,48 +191,12 @@ export default function WalletPage() {
               </div>
             </motion.div>
 
-            {/* Private Key Card (Demo Only) */}
-            {privateKey && (
-              <motion.div
-                className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-red-500/30 p-6'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className='flex items-center justify-between mb-4'>
-                  <h3 className='text-lg font-semibold text-white'>
-                    Privatni Ključ (Demo)
-                  </h3>
-                  <Button
-                    variant='ghost'
-                    onClick={() => setShowPrivateKey(!showPrivateKey)}
-                    className='text-gray-400 hover:text-white'
-                  >
-                    {showPrivateKey ? (
-                      <EyeOff className='w-5 h-5' />
-                    ) : (
-                      <Eye className='w-5 h-5' />
-                    )}
-                  </Button>
-                </div>
-                <div className='bg-gray-900/50 rounded-lg p-4'>
-                  <code className='text-red-300 font-mono text-xs break-all'>
-                    {showPrivateKey ? privateKey : '•'.repeat(64)}
-                  </code>
-                </div>
-                <p className='text-red-300 text-sm mt-3'>
-                  ⚠️ U stvarnoj aplikaciji, privatni ključ se nikada ne bi
-                  prikazivao ovako. Ovo je samo za demo.
-                </p>
-              </motion.div>
-            )}
-
             {/* Actions */}
             <motion.div
               className='grid grid-cols-1 sm:grid-cols-2 gap-4'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.2 }}
             >
               <Button
                 variant='primary'
@@ -306,19 +207,12 @@ export default function WalletPage() {
                 <RefreshCw className='w-5 h-5 mr-2' />
                 Zatraži Airdrop (1 SOL)
               </Button>
-              <Button
-                variant='outline'
-                onClick={() => {
-                  localStorage.removeItem('demo_wallet');
-                  localStorage.removeItem('demo_private_key');
-                  setWallet(null);
-                  setPrivateKey('');
-                  setBalance(0);
-                }}
-                className='border-2 border-red-500/50 text-red-300 hover:bg-red-500/20 font-bold py-4 rounded-xl'
-              >
-                Obriši Wallet
-              </Button>
+              <div className='bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4'>
+                <p className='text-yellow-200 text-sm'>
+                  ⚠️ Airdrop radi samo na devnet mreži. Ako ste na mainnet, ova
+                  opcija neće raditi.
+                </p>
+              </div>
             </motion.div>
 
             {/* Quick Info */}
@@ -326,7 +220,7 @@ export default function WalletPage() {
               className='bg-purple-500/10 border border-purple-500/30 rounded-xl p-6'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3 }}
             >
               <h3 className='text-xl font-semibold text-white mb-3'>
                 Sljedeći koraci:

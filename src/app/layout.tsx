@@ -5,6 +5,7 @@ import '../styles/globals.css';
 
 import { Footer } from '@/app/components/Footer';
 import { Navbar } from '@/app/components/Navbar';
+import { WalletContextProvider } from '@/contexts/WalletProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,11 +23,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           ' bg-gradient-to-br from-indigo-900 to-black text-white min-h-screen'
         }
       >
-        <div className='container mx-auto px-4'>
-          <Navbar />
-          <main className='py-10'>{children}</main>
-          <Footer />
-        </div>
+        <WalletContextProvider>
+          <div className='container mx-auto px-4'>
+            <Navbar />
+            <main className='py-10'>{children}</main>
+            <Footer />
+          </div>
+        </WalletContextProvider>
       </body>
     </html>
   );

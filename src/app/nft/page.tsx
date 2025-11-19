@@ -1,18 +1,21 @@
 'use client';
 
+import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Image as ImageIcon, Loader, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { type NFTInfo, mockSolana } from '@/lib/solana/mockSolana';
+import { type NFTInfo, solanaService } from '@/lib/solana/solanaService';
 
 import Button from '@/components/buttons/Button';
 
 export default function NFTPage() {
+  const { publicKey, signTransaction, connected } = useWallet();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [createdNFT, setCreatedNFT] = useState<NFTInfo | null>(null);
   const [nfts, setNfts] = useState<NFTInfo[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,27 +23,27 @@ export default function NFTPage() {
     imageUrl: '',
   });
 
-  // Load NFTs on mount (demo - would load from wallet in real app)
+  // Load NFTs when wallet connects
   useEffect(() => {
-    loadNFTs();
-  }, []);
+    if (connected && publicKey) {
+      loadNFTs();
+    } else {
+      setNfts([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, publicKey]);
 
   const loadNFTs = async () => {
-    // Demo: Load from localStorage or show sample NFTs
-    const savedNFTs = localStorage.getItem('demo_nfts');
-    if (savedNFTs) {
-      setNfts(JSON.parse(savedNFTs));
-    } else {
-      // Show some sample NFTs for demo
-      setNfts([
-        {
-          mint: 'sample1',
-          name: 'Primjer NFT #1',
-          image: 'https://via.placeholder.com/300x300/8B5CF6/FFFFFF?text=NFT+1',
-          description: 'Ovo je primjer NFT-a',
-          owner: 'demo',
-        },
-      ]);
+    if (!publicKey) return;
+
+    setIsLoading(true);
+    try {
+      const walletNFTs = await solanaService.getNFTs(publicKey.toString());
+      setNfts(walletNFTs);
+    } catch (error) {
+      // Error loading NFTs
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,29 +52,40 @@ export default function NFTPage() {
   };
 
   const handleMintNFT = async () => {
+    if (!connected || !publicKey || !signTransaction) {
+      setError('Molimo povežite svoj wallet prvo');
+      return;
+    }
+
     if (!formData.name || !formData.description || !formData.imageUrl) {
-      alert('Molimo unesite sve podatke');
+      setError('Molimo unesite sve podatke');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
     setStep(2);
 
     try {
-      const nft = await mockSolana.mintNFT(
+      const nft = await solanaService.mintNFT(
         formData.name,
         formData.description,
         formData.imageUrl,
-        'demo_wallet',
+        publicKey.toString(),
+        publicKey,
+        signTransaction,
       );
 
       setCreatedNFT(nft);
       const updatedNFTs = [...nfts, nft];
       setNfts(updatedNFTs);
-      localStorage.setItem('demo_nfts', JSON.stringify(updatedNFTs));
       setStep(3);
     } catch (error) {
-      alert('Greška pri kreiranju NFT-a');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Greška pri kreiranju NFT-a. Provjerite da imate dovoljno SOL-a za transakciju.',
+      );
       setStep(1);
     } finally {
       setIsLoading(false);
@@ -81,6 +95,7 @@ export default function NFTPage() {
   const resetForm = () => {
     setStep(1);
     setCreatedNFT(null);
+    setError(null);
     setFormData({
       name: '',
       description: '',
@@ -107,19 +122,6 @@ export default function NFTPage() {
           </p>
         </motion.div>
 
-        {/* Demo Banner */}
-        <motion.div
-          className='mb-8 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <p className='text-yellow-200 text-sm text-center'>
-            🧪 Demo Mode: Ovo je simulacija. Stvarni NFT-ovi će biti kreirani na
-            Solana blockchainu kada implementiramo pravu integraciju.
-          </p>
-        </motion.div>
-
         {/* Tabs */}
         <div className='flex gap-4 mb-8 border-b border-gray-700'>
           <button
@@ -135,7 +137,7 @@ export default function NFTPage() {
           <button
             onClick={() => {
               setStep(4);
-              loadNFTs();
+              if (connected) loadNFTs();
             }}
             className={`px-6 py-3 font-semibold transition-colors ${
               step === 4
@@ -146,6 +148,29 @@ export default function NFTPage() {
             Moja Galerija ({nfts.length})
           </button>
         </div>
+
+        {!connected && step !== 4 && (
+          <motion.div
+            className='bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-6 text-center mb-8'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <p className='text-yellow-200'>
+              🔗 Molimo povežite svoj wallet u navigaciji prije kreiranja NFT-a.
+            </p>
+          </motion.div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            className='mb-6 bg-red-500/20 border border-red-500/50 rounded-xl p-4'
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <p className='text-red-200 text-sm'>{error}</p>
+          </motion.div>
+        )}
 
         {/* Step 1: Create Form */}
         {step === 1 && (
@@ -222,10 +247,19 @@ export default function NFTPage() {
                 </div>
               )}
 
+              <div className='bg-blue-500/10 border border-blue-500/30 rounded-xl p-4'>
+                <p className='text-blue-200 text-sm'>
+                  💡 <strong>Napomena:</strong> Mintanje NFT-a zahtijeva SOL za
+                  transakciju (oko 0.01-0.05 SOL). Provjerite da imate dovoljno
+                  sredstava u walletu.
+                </p>
+              </div>
+
               <Button
                 variant='primary'
                 onClick={handleMintNFT}
                 isLoading={isLoading}
+                disabled={!connected}
                 className='w-full bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-lg py-4 rounded-xl'
               >
                 <Upload className='w-5 h-5 mr-2 inline' />
@@ -246,8 +280,11 @@ export default function NFTPage() {
             <h2 className='text-2xl font-bold text-white mb-2'>
               Mintanje NFT-a...
             </h2>
-            <p className='text-gray-300'>
+            <p className='text-gray-300 mb-4'>
               Molimo pričekajte dok se NFT kreira na blockchainu
+            </p>
+            <p className='text-gray-400 text-sm'>
+              Možda ćete trebati potvrditi transakciju u vašem walletu
             </p>
           </motion.div>
         )}
@@ -313,7 +350,17 @@ export default function NFTPage() {
             animate={{ opacity: 1 }}
             className='space-y-6'
           >
-            {nfts.length === 0 ? (
+            {!connected ? (
+              <div className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-12 text-center'>
+                <ImageIcon className='w-16 h-16 mx-auto text-gray-500 mb-4' />
+                <h3 className='text-2xl font-bold text-white mb-2'>
+                  Povežite Wallet
+                </h3>
+                <p className='text-gray-400 mb-6'>
+                  Povežite svoj wallet da biste vidjeli svoje NFT-ove!
+                </p>
+              </div>
+            ) : nfts.length === 0 ? (
               <div className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-12 text-center'>
                 <ImageIcon className='w-16 h-16 mx-auto text-gray-500 mb-4' />
                 <h3 className='text-2xl font-bold text-white mb-2'>
@@ -340,12 +387,18 @@ export default function NFTPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={nft.image}
-                      alt={nft.name}
-                      className='w-full h-64 object-cover'
-                    />
+                    {nft.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={nft.image}
+                        alt={nft.name}
+                        className='w-full h-64 object-cover'
+                      />
+                    ) : (
+                      <div className='w-full h-64 bg-gray-700 flex items-center justify-center'>
+                        <ImageIcon className='w-16 h-16 text-gray-500' />
+                      </div>
+                    )}
                     <div className='p-4'>
                       <h3 className='text-xl font-bold text-white mb-2'>
                         {nft.name}
