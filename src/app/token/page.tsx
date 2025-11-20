@@ -80,20 +80,20 @@ export default function TokenPage() {
   };
 
   return (
-    <div className='min-h-screen py-12 px-4 md:px-8 lg:px-12'>
+    <div className='min-h-screen py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-8 lg:px-12'>
       <div className='max-w-4xl mx-auto'>
         {/* Header */}
         <motion.div
-          className='text-center mb-12'
+          className='text-center mb-8 sm:mb-10 md:mb-12'
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className='text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4'>
-            <Coins className='inline-block w-12 h-12 mr-4 text-purple-300' />
+          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-4'>
+            <Coins className='inline-block w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mr-2 sm:mr-3 md:mr-4 text-purple-300' />
             Kreiraj Token
           </h1>
-          <p className='text-xl text-gray-300'>
+          <p className='text-base sm:text-lg md:text-xl text-gray-300 px-2'>
             Kreirajte svoj vlastiti token na Solani u nekoliko koraka
           </p>
         </motion.div>
@@ -112,12 +112,12 @@ export default function TokenPage() {
         ) : (
           <>
             {/* Progress Steps */}
-            <div className='flex items-center justify-center mb-8'>
+            <div className='flex items-center justify-center mb-6 sm:mb-8 px-2'>
               {[1, 2, 3].map((s) => (
                 <div key={s} className='flex items-center'>
                   <div
                     className={`
-                      w-12 h-12 rounded-full flex items-center justify-center font-bold
+                      w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-base
                       ${
                         step >= s
                           ? 'bg-purple-500 text-white'
@@ -125,11 +125,15 @@ export default function TokenPage() {
                       }
                     `}
                   >
-                    {step > s ? <CheckCircle className='w-6 h-6' /> : s}
+                    {step > s ? (
+                      <CheckCircle className='w-5 h-5 sm:w-6 sm:h-6' />
+                    ) : (
+                      s
+                    )}
                   </div>
                   {s < 3 && (
                     <div
-                      className={`w-24 h-1 mx-2 ${
+                      className={`w-12 sm:w-16 md:w-24 h-1 mx-1 sm:mx-2 ${
                         step > s ? 'bg-purple-500' : 'bg-gray-700'
                       }`}
                     />
@@ -152,11 +156,11 @@ export default function TokenPage() {
             {/* Step 1: Form */}
             {step === 1 && (
               <motion.div
-                className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-8'
+                className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-4 sm:p-6 md:p-8'
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
-                <h2 className='text-2xl font-bold text-white mb-6'>
+                <h2 className='text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6'>
                   Korak 1: Unesite podatke o tokenu
                 </h2>
 
@@ -272,21 +276,21 @@ export default function TokenPage() {
             {/* Step 3: Success */}
             {step === 3 && createdToken && (
               <motion.div
-                className='bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-sm rounded-2xl border-2 border-green-500/50 p-8'
+                className='bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-sm rounded-2xl border-2 border-green-500/50 p-4 sm:p-6 md:p-8'
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <div className='text-center mb-6'>
-                  <CheckCircle className='w-16 h-16 mx-auto text-green-400 mb-4' />
-                  <h2 className='text-3xl font-bold text-white mb-2'>
+                <div className='text-center mb-4 sm:mb-6'>
+                  <CheckCircle className='w-12 h-12 sm:w-16 sm:h-16 mx-auto text-green-400 mb-3 sm:mb-4' />
+                  <h2 className='text-2xl sm:text-3xl font-bold text-white mb-2'>
                     Token uspješno kreiran! 🎉
                   </h2>
-                  <p className='text-gray-300'>
+                  <p className='text-sm sm:text-base text-gray-300'>
                     Vaš token je sada dostupan na Solana blockchainu
                   </p>
                 </div>
 
-                <div className='bg-gray-900/50 rounded-xl p-6 space-y-4 mb-6'>
+                <div className='bg-gray-900/50 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4 mb-4 sm:mb-6'>
                   <div>
                     <label className='text-gray-400 text-sm'>Ime</label>
                     <p className='text-white font-semibold text-lg'>
@@ -316,18 +320,18 @@ export default function TokenPage() {
                   </div>
                 </div>
 
-                <div className='flex gap-4'>
+                <div className='flex flex-col sm:flex-row gap-3 sm:gap-4'>
                   <Button
                     variant='primary'
                     onClick={resetForm}
-                    className='flex-1 bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold py-4 rounded-xl'
+                    className='flex-1 bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold py-3 sm:py-4 rounded-xl text-sm sm:text-base'
                   >
                     Kreiraj Novi Token
                   </Button>
                   <Button
                     variant='outline'
                     onClick={() => (window.location.href = '/wallet')}
-                    className='flex-1 border-2 border-purple-300 text-purple-300 hover:bg-purple-700/50 font-bold py-4 rounded-xl'
+                    className='flex-1 border-2 border-purple-300 text-purple-300 hover:bg-purple-700/50 font-bold py-3 sm:py-4 rounded-xl text-sm sm:text-base'
                   >
                     Idi na Wallet
                   </Button>

@@ -24,9 +24,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         }
       >
         <WalletContextProvider>
-          <div className='container mx-auto px-4'>
+          <div className='container mx-auto px-0 sm:px-4'>
             <Navbar />
-            <main className='py-10'>{children}</main>
+            <main className='py-6 sm:py-8 md:py-10'>{children}</main>
             <Footer />
           </div>
         </WalletContextProvider>

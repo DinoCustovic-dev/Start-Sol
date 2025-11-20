@@ -25,25 +25,25 @@ export function Hero() {
 
       {/* SADRŽAJ S POBOLJŠANIM KONTRASTOM I ČITLJIVOŠĆU */}
       <motion.div
-        className='relative z-10 max-w-5xl mx-auto px-6 md:px-8 lg:px-12 py-24'
+        className='relative z-10 max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-24'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
         <motion.h1
-          className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-white mb-8 drop-shadow-lg'
+          className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight text-white mb-6 sm:mb-8 drop-shadow-lg px-2'
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           Dobrodošli u{' '}
-          <span className='text-purple-300 drop-shadow-lg'>
+          <span className='text-purple-300 drop-shadow-lg block sm:inline'>
             Solana Onboard Hub
           </span>
         </motion.h1>
 
         <motion.p
-          className='text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto text-gray-100 font-medium mb-16 drop-shadow-lg'
+          className='text-base sm:text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto text-gray-100 font-medium mb-10 sm:mb-12 md:mb-16 drop-shadow-lg px-2'
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -53,7 +53,7 @@ export function Hero() {
         </motion.p>
 
         <motion.div
-          className='flex flex-col sm:flex-row justify-center gap-5 sm:gap-8'
+          className='flex flex-col sm:flex-row justify-center gap-4 sm:gap-5 md:gap-8 px-2'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
@@ -62,7 +62,7 @@ export function Hero() {
             <a className='w-full sm:w-auto'>
               <Button
                 variant='primary'
-                className='w-full bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-lg md:text-xl px-8 py-5 rounded-xl shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all duration-300'
+                className='w-full sm:w-auto bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-base sm:text-lg md:text-xl px-6 sm:px-8 py-3 sm:py-4 md:py-5 rounded-xl shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all duration-300'
                 as='button'
               >
                 Kreiraj Wallet
@@ -74,7 +74,7 @@ export function Hero() {
             <a className='w-full sm:w-auto'>
               <Button
                 variant='secondary'
-                className='w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg md:text-xl px-8 py-5 rounded-xl shadow-lg shadow-indigo-500/40 hover:shadow-indigo-500/60 transition-all duration-300'
+                className='w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base sm:text-lg md:text-xl px-6 sm:px-8 py-3 sm:py-4 md:py-5 rounded-xl shadow-lg shadow-indigo-500/40 hover:shadow-indigo-500/60 transition-all duration-300'
                 as='button'
               >
                 Mintaj Token
@@ -86,7 +86,7 @@ export function Hero() {
             <a className='w-full sm:w-auto'>
               <Button
                 variant='outline'
-                className='w-full border-2 border-purple-300 hover:border-purple-200 text-white hover:text-white hover:bg-purple-700/50 font-bold text-lg md:text-xl px-8 py-5 rounded-xl shadow-lg transition-all duration-300'
+                className='w-full sm:w-auto border-2 border-purple-300 hover:border-purple-200 text-white hover:text-white hover:bg-purple-700/50 font-bold text-base sm:text-lg md:text-xl px-6 sm:px-8 py-3 sm:py-4 md:py-5 rounded-xl shadow-lg transition-all duration-300'
                 as='button'
               >
                 Nauči osnove

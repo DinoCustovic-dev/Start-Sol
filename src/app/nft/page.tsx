@@ -105,29 +105,29 @@ export default function NFTPage() {
   };
 
   return (
-    <div className='min-h-screen py-12 px-4 md:px-8 lg:px-12'>
+    <div className='min-h-screen py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-8 lg:px-12'>
       <div className='max-w-6xl mx-auto'>
         {/* Header */}
         <motion.div
-          className='text-center mb-12'
+          className='text-center mb-8 sm:mb-10 md:mb-12'
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className='text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4'>
-            <ImageIcon className='inline-block w-12 h-12 mr-4 text-purple-300' />
+          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 sm:mb-4'>
+            <ImageIcon className='inline-block w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mr-2 sm:mr-3 md:mr-4 text-purple-300' />
             NFT Galerija
           </h1>
-          <p className='text-xl text-gray-300'>
+          <p className='text-base sm:text-lg md:text-xl text-gray-300 px-2'>
             Kreirajte i pregledajte svoje NFT-ove
           </p>
         </motion.div>
 
         {/* Tabs */}
-        <div className='flex gap-4 mb-8 border-b border-gray-700'>
+        <div className='flex gap-2 sm:gap-4 mb-6 sm:mb-8 border-b border-gray-700 overflow-x-auto'>
           <button
             onClick={() => setStep(1)}
-            className={`px-6 py-3 font-semibold transition-colors ${
+            className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
               step === 1
                 ? 'text-purple-300 border-b-2 border-purple-300'
                 : 'text-gray-400 hover:text-gray-300'
@@ -140,7 +140,7 @@ export default function NFTPage() {
               setStep(4);
               if (connected) loadNFTs();
             }}
-            className={`px-6 py-3 font-semibold transition-colors ${
+            className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-colors whitespace-nowrap text-sm sm:text-base ${
               step === 4
                 ? 'text-purple-300 border-b-2 border-purple-300'
                 : 'text-gray-400 hover:text-gray-300'
@@ -176,11 +176,11 @@ export default function NFTPage() {
         {/* Step 1: Create Form */}
         {step === 1 && (
           <motion.div
-            className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-8'
+            className='bg-gray-800/50 backdrop-blur-sm rounded-2xl border-2 border-gray-700 p-4 sm:p-6 md:p-8'
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <h2 className='text-2xl font-bold text-white mb-6'>
+            <h2 className='text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6'>
               Kreiraj Novi NFT
             </h2>
 
@@ -233,13 +233,13 @@ export default function NFTPage() {
               </div>
 
               {formData.imageUrl && (
-                <div className='bg-gray-900/50 rounded-lg p-4'>
+                <div className='bg-gray-900/50 rounded-lg p-3 sm:p-4'>
                   <p className='text-gray-400 text-sm mb-2'>Pregled:</p>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={formData.imageUrl}
                     alt='Preview'
-                    className='w-48 h-48 object-cover rounded-lg'
+                    className='w-full max-w-xs sm:w-48 sm:h-48 object-cover rounded-lg mx-auto'
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
                         'https://via.placeholder.com/300x300/8B5CF6/FFFFFF?text=Image+Not+Found';
@@ -322,21 +322,21 @@ export default function NFTPage() {
               </div>
             </div>
 
-            <div className='flex gap-4'>
+            <div className='flex flex-col sm:flex-row gap-3 sm:gap-4'>
               <Button
                 variant='primary'
                 onClick={() => {
                   resetForm();
                   setStep(4);
                 }}
-                className='flex-1 bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold py-4 rounded-xl'
+                className='flex-1 bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold py-3 sm:py-4 rounded-xl text-sm sm:text-base'
               >
                 Pregledaj Galeriju
               </Button>
               <Button
                 variant='outline'
                 onClick={resetForm}
-                className='flex-1 border-2 border-purple-300 text-purple-300 hover:bg-purple-700/50 font-bold py-4 rounded-xl'
+                className='flex-1 border-2 border-purple-300 text-purple-300 hover:bg-purple-700/50 font-bold py-3 sm:py-4 rounded-xl text-sm sm:text-base'
               >
                 Kreiraj Novi NFT
               </Button>
