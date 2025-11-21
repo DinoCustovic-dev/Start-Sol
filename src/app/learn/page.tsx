@@ -138,19 +138,19 @@ export default function LearnPage() {
   };
 
   return (
-    <div className='min-h-screen py-12 px-4 md:px-8 lg:px-12'>
+    <div className='min-h-screen py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-8 lg:px-12'>
       <div className='max-w-6xl mx-auto'>
         {/* Header */}
         <motion.div
-          className='text-center mb-16'
+          className='text-center mb-10 sm:mb-12 md:mb-16'
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className='text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6'>
+          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6 px-2'>
             Nauči <span className='text-purple-300'>Osnove Solane</span>
           </h1>
-          <p className='text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto'>
+          <p className='text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-3xl mx-auto px-2'>
             Jednostavna objašnjenja za obične ljude. Bez tehničkog žargona, bez
             kompliciranja.
           </p>
@@ -158,7 +158,7 @@ export default function LearnPage() {
 
         {/* Progress Bar */}
         <motion.div
-          className='mb-12'
+          className='mb-8 sm:mb-10 md:mb-12'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -200,33 +200,35 @@ export default function LearnPage() {
               >
                 <button
                   onClick={() => toggleSection(section.id)}
-                  className='w-full p-6 flex items-center justify-between text-left'
+                  className='w-full p-4 sm:p-6 flex items-center justify-between text-left'
                 >
-                  <div className='flex items-center gap-4'>
+                  <div className='flex items-center gap-3 sm:gap-4 flex-1 min-w-0'>
                     <div
                       className={cn(
-                        'p-3 rounded-xl transition-colors',
+                        'p-2 sm:p-3 rounded-xl transition-colors flex-shrink-0',
                         isActive
                           ? 'bg-purple-500/20 text-purple-300'
                           : 'bg-gray-700/50 text-gray-400',
                       )}
                     >
-                      <Icon className='w-6 h-6' />
+                      <Icon className='w-5 h-5 sm:w-6 sm:h-6' />
                     </div>
-                    <div>
-                      <h2 className='text-2xl font-bold text-white mb-1'>
+                    <div className='flex-1 min-w-0'>
+                      <h2 className='text-lg sm:text-xl md:text-2xl font-bold text-white mb-1'>
                         {section.title}
                       </h2>
-                      <p className='text-gray-400 text-sm'>Klikni za detalje</p>
+                      <p className='text-gray-400 text-xs sm:text-sm'>
+                        Klikni za detalje
+                      </p>
                     </div>
                   </div>
-                  <div className='flex items-center gap-3'>
+                  <div className='flex items-center gap-2 sm:gap-3 flex-shrink-0'>
                     {isCompleted && (
-                      <CheckCircle className='w-6 h-6 text-green-400' />
+                      <CheckCircle className='w-5 h-5 sm:w-6 sm:h-6 text-green-400' />
                     )}
                     <ArrowRight
                       className={cn(
-                        'w-6 h-6 transition-transform',
+                        'w-5 h-5 sm:w-6 sm:h-6 transition-transform flex-shrink-0',
                         isActive && 'rotate-90',
                       )}
                     />
@@ -238,14 +240,14 @@ export default function LearnPage() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className='px-6 pb-6 border-t border-gray-700 pt-6'
+                    className='px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-700 pt-4 sm:pt-6'
                   >
-                    <div className='space-y-6'>
-                      <p className='text-lg text-gray-200 leading-relaxed'>
+                    <div className='space-y-4 sm:space-y-6'>
+                      <p className='text-base sm:text-lg text-gray-200 leading-relaxed'>
                         {section.content.overview}
                       </p>
 
-                      <div className='bg-purple-500/10 border border-purple-500/30 rounded-xl p-4'>
+                      <div className='bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 sm:p-4'>
                         <p className='text-purple-200 font-medium mb-2'>
                           💡 Analogija:
                         </p>
@@ -255,16 +257,16 @@ export default function LearnPage() {
                       </div>
 
                       <div>
-                        <h3 className='text-xl font-semibold text-white mb-4'>
+                        <h3 className='text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4'>
                           Ključne karakteristike:
                         </h3>
                         <ul className='space-y-2'>
                           {section.content.keyPoints.map((point, idx) => (
                             <li
                               key={idx}
-                              className='flex items-start gap-3 text-gray-300'
+                              className='flex items-start gap-2 sm:gap-3 text-sm sm:text-base text-gray-300'
                             >
-                              <CheckCircle className='w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0' />
+                              <CheckCircle className='w-4 h-4 sm:w-5 sm:h-5 text-purple-400 mt-0.5 flex-shrink-0' />
                               <span>{point}</span>
                             </li>
                           ))}
@@ -280,22 +282,22 @@ export default function LearnPage() {
 
         {/* Call to Action */}
         <motion.div
-          className='mt-16 text-center'
+          className='mt-10 sm:mt-12 md:mt-16 text-center'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <div className='bg-gradient-to-r from-purple-600/20 to-fuchsia-600/20 rounded-2xl p-8 border border-purple-500/30'>
-            <h2 className='text-3xl font-bold text-white mb-4'>
+          <div className='bg-gradient-to-r from-purple-600/20 to-fuchsia-600/20 rounded-2xl p-6 sm:p-8 border border-purple-500/30'>
+            <h2 className='text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4'>
               Spremni za početak?
             </h2>
-            <p className='text-gray-300 mb-6 text-lg'>
+            <p className='text-gray-300 mb-4 sm:mb-6 text-base sm:text-lg px-2'>
               Kreirajte svoj wallet i počnite koristiti Solanu u manje od 2
               minute!
             </p>
             <Button
               variant='primary'
-              className='bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-lg px-8 py-4 rounded-xl'
+              className='bg-gradient-to-r from-purple-500 to-fuchsia-600 hover:from-purple-600 hover:to-fuchsia-700 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl'
               as='a'
               href='/wallet'
             >
